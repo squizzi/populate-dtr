@@ -26,3 +26,6 @@ if [ -z "DTR_PASSWORD" ]; then
 fi
 ```
 
+## TODOs
+* Apply license automatically if unlicensed
+* Set "Create Repository on Push" if not set

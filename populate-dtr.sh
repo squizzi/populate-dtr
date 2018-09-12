@@ -1,6 +1,16 @@
 #!/bin/sh
-while getopts ":u:p:H:" opt; do
+
+# Usage/help text
+usage_text () {
+    echo -e "Usage: docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -H <hostname>:<port> -u <username> -p <password>"
+    exit 1
+}
+
+while getopts "hu:p:H:" opt; do
   case $opt in
+    h)
+      usage_text
+      ;;
     u)
       DTR_USER="$OPTARG"
       ;;
@@ -11,25 +21,25 @@ while getopts ":u:p:H:" opt; do
       DTR_URL="$OPTARG"
       ;;
     \?)
-      echo "Invalid option: -$OPTARG" >&2
+      usage_text
       exit 1
       ;;
     :)
-      echo "Option -$OPTARG requires an argument." >&2
+      echo -e "Option -$OPTARG requires an argument." >&2
       exit 1;
       ;;
     esac
-  done
+done
 
 # Check for docker socket
 if [ ! -e "/var/run/docker.sock" ]; then
-    echo "Docker not detected, did you forget to mount docker.sock?"
+    echo -e "Docker not detected, did you forget to mount docker.sock?"
     exit 1
 fi
 
 # Check for DTR_URL
 if [ -z "$DTR_URL" ]; then
-    echo "Option -H requires an argument: a DTR URL is required"
+    echo -e "Option -H requires an argument: a DTR URL is required"
     exit 1
 fi
 
@@ -46,7 +56,10 @@ fi
 
 # Login
 echo -e "Logging into $DTR_URL as $DTR_USER"
-docker login $DTR_URL -u $DTR_USER -p $DTR_PASSWORD
+if ! docker login $DTR_URL -u $DTR_USER -p $DTR_PASSWORD >/dev/null; then
+    echo -e "Unable to login to $DTR_URL"
+    exit 1
+fi
 
 # Pull several different images and some tags from hub
 echo -e 'Pulling several different images and tags...'

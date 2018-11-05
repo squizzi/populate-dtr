@@ -78,7 +78,7 @@ docker pull redis
 
 # Tag and push the pulled images with the defined user
 echo -e "${CYAN}Pushing the pulled images as $DTR_USER...${NC}"
-IMAGES=$(docker images -a | egrep -vi 'docker|repository' | awk '{print $1":"$2}')
+IMAGES=$(docker images -a | egrep -vi 'docker|repository|populate' | awk '{print $1":"$2}')
 for image in $IMAGES
 do
     docker tag $image $DTR_URL/$DTR_USER/$image

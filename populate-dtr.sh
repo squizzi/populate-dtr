@@ -6,6 +6,11 @@ usage_text () {
     exit 1
 }
 
+# Colors
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
 while getopts "hu:p:H:" opt; do
   case $opt in
     h)
@@ -33,36 +38,36 @@ done
 
 # Check for docker socket
 if [ ! -e "/var/run/docker.sock" ]; then
-    echo -e "Docker not detected, did you forget to mount docker.sock?"
+    echo -e "${RED}Error: Docker not detected, did you forget to mount docker.sock?${NC}"
     exit 1
 fi
 
 # Check for DTR_URL
 if [ -z "$DTR_URL" ]; then
-    echo -e "Option -H requires an argument: a DTR URL is required"
+    echo -e "${CYAN}Option -H requires an argument: a DTR URL is required${NC}"
     exit 1
 fi
 
 # Populate commonly used defaults if they aren't already set
 if [ -z "DTR_USER" ]; then
     DTR_USER="admin"
-    echo -e "Using default username: $DTR_USER"
+    echo -e "${CYAN}Using default username: $DTR_USER${NC}"
 fi
 
 if [ -z "DTR_PASSWORD" ]; then
     DTR_PASSWORD="foobarfun"
-    echo -e "Using default password: $DTR_PASSWORD"
+    echo -e "${CYAN}Using default password: $DTR_PASSWORD${NC}"
 fi
 
 # Login
-echo -e "Logging into $DTR_URL as $DTR_USER"
+echo -e "${CYAN}Logging into $DTR_URL as $DTR_USER${NC}"
 if ! docker login $DTR_URL -u $DTR_USER -p $DTR_PASSWORD >/dev/null; then
-    echo -e "Unable to login to $DTR_URL"
+    echo -e "${RED}Error: Unable to login to $DTR_URL${NC}"
     exit 1
 fi
 
 # Pull several different images and some tags from hub
-echo -e 'Pulling several different images and tags...'
+echo -e "${CYAN}Pulling several different images and tags...${NC}"
 docker pull nginx
 docker pull alpine
 docker pull ubuntu
@@ -72,7 +77,7 @@ docker pull fedora
 docker pull redis
 
 # Tag and push the pulled images with the defined user
-echo -e "Pushing the pulled images as $DTR_USER..."
+echo -e "${CYAN}Pushing the pulled images as $DTR_USER...${NC}"
 IMAGES=$(docker images -a | egrep -vi 'docker|repository' | awk '{print $1":"$2}')
 for image in $IMAGES
 do

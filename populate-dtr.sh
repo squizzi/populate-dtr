@@ -61,7 +61,7 @@ fi
 
 # Login
 echo -e "${CYAN}Logging into $DTR_URL as $DTR_USER${NC}"
-if ! docker login $DTR_URL -u $DTR_USER -p $DTR_PASSWORD >/dev/null; then
+if ! docker login $DTR_URL -u $DTR_USER -p $DTR_PASSWORD > /dev/null 2>&1; then
     echo -e "${RED}Error: Unable to login to $DTR_URL${NC}"
     exit 1
 fi
